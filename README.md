@@ -153,17 +153,34 @@ hyperblaze doctor
 
 ## Performance
 
-Benchmarked on a 12-core machine with 32 GB RAM:
+| Metric | Hyperblaze | Bazel 8.x | Buck2 | Pants | Status |
+|--------|-----------|-----------|-------|-------|--------|
+| **Cold startup** | 0.4ms | 3,000-15,000ms | ~100ms | ~500ms | Measured |
+| **Memory (idle)** | ~10 MB | ~500 MB | ~50 MB | ~100 MB | Measured |
+| **Memory (large build)** | ~50-200 MB | 8-14 GB | ~1-2 GB | ~500 MB | Target |
+| **No-op rebuild** | <10ms | 500-3,000ms | ~50ms | ~200ms | Target |
+| **Hashing (BLAKE3)** | 3-5x faster | SHA-256 | BLAKE3 | SHA-256 | Measured |
 
-| Metric | Hyperblaze | Bazel 8.x | Buck2 | Pants |
-|--------|-----------|-----------|-------|-------|
-| **Cold startup** | 0.4ms | 3,000-15,000ms | ~100ms | ~500ms |
-| **Memory (idle)** | ~10 MB | ~500 MB | ~50 MB | ~100 MB |
-| **Memory (large build)** | ~50-200 MB | 8-14 GB | ~1-2 GB | ~500 MB |
-| **No-op rebuild** | <10ms* | 500-3,000ms | ~50ms | ~200ms |
-| **Hashing (BLAKE3)** | 3-5x faster | SHA-256 | BLAKE3 | SHA-256 |
+> **Note:** "Measured" values come from `hyperblaze info` on a 12-core Windows machine.
+> "Target" values are design goals for Phase 1+ (file watching daemon, real compilation rules).
+> Hyperblaze does not yet compile real projects -- these targets are based on architectural analysis.
 
-*\* Target for Phase 1 with file watching daemon*
+---
+
+## Current Limitations
+
+Hyperblaze is at **v0.1.0** (early alpha). Be aware of what it cannot do yet:
+
+- **No real compilation** -- does not invoke `rustc`, `go build`, or any compiler yet
+- **No BUILD file parser** -- BUILD.hb syntax is designed but not implemented
+- **No dependency inference** -- cannot scan source imports to discover deps
+- **No remote cache/execution** -- local only, RE API planned for Phase 3
+- **No WASM sandboxing** -- actions run unsandboxed on the host
+- **No TUI progress bars** -- text output only (ratatui integration planned)
+- **No file watcher daemon** -- each invocation is standalone (daemon planned for Phase 1)
+- **Single developer project** -- not battle-tested at scale
+
+See the [Roadmap](#roadmap) for planned timelines.
 
 ---
 
@@ -334,11 +351,11 @@ test hb_graph::evaluator::tests::test_cache_hit ... ok
 
 ## Contributing
 
-Hyperblaze is in early development and contributions are welcome!
+Hyperblaze is a solo project in early development by [@Ashutosh0x](https://github.com/Ashutosh0x). Contributions are welcome!
 
 ```bash
 # Clone the repo
-git clone https://github.com/hyperblaze/hyperblaze.git
+git clone https://github.com/Ashutosh0x/hyperblaze.git
 cd hyperblaze
 
 # Build
@@ -357,10 +374,11 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for technical details.
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License -- see [LICENSE](LICENSE) for details.
 
 ---
 
 <p align="center">
-  <strong>Built with Rust by the Hyperblaze team</strong>
+  <strong>Built with Rust by <a href="https://github.com/Ashutosh0x">Ashutosh Kumar Singh</a></strong>
 </p>
+
