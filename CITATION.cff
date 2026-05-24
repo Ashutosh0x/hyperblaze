@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use Hyperblaze in research, demos, or benchmarks, please cite it using this metadata."
+title: "Hyperblaze"
+type: software
+authors:
+  - family-names: "Singh"
+    given-names: "Ashutosh Kumar"
+    alias: "Ashutosh0x"
+repository-code: "https://github.com/Ashutosh0x/hyperblaze"
+url: "https://github.com/Ashutosh0x/hyperblaze"
+license: "MIT"
+version: "0.1.0"
+date-released: "2026-05-24"
+keywords:
+  - "Rust"
+  - "build system"
+  - "incremental computation"
+  - "Bazel"
+  - "developer tools"

@@ -1,7 +1,7 @@
 # Build outputs
 /target/
-/.hb-out/
-/.hb-cache/
+.hb-out/
+.hb-cache/
 
 # IDE
 .idea/
@@ -15,3 +15,4 @@ Thumbs.db
 
 # Generated
 HYPERBLAZE.toml
+!examples/**/HYPERBLAZE.toml

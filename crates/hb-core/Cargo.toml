@@ -2,6 +2,7 @@
 name = "hb-core"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 description = "Core runtime, platform abstractions, VFS, and hashing for Hyperblaze"
 

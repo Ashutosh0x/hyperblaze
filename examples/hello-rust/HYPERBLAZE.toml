@@ -1,0 +1,8 @@
+[project]
+name = "hello-rust"
+version = "0.1.0"
+
+[build]
+jobs = 0
+disk_cache = true
+output_base = ".hb-out"

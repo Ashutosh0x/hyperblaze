@@ -11,7 +11,8 @@
 <p align="center">
   <a href="#performance"><img src="https://img.shields.io/badge/startup-0.4ms-00C853?style=for-the-badge&logo=zap&logoColor=white" alt="Startup Time" /></a>
   <a href="#performance"><img src="https://img.shields.io/badge/memory-~50MB-2196F3?style=for-the-badge&logo=databricks&logoColor=white" alt="Memory" /></a>
-  <a href=".github/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-CI_covered-00C853?style=for-the-badge&logo=checkmarx&logoColor=white" alt="Tests" /></a>
+  <a href="https://github.com/Ashutosh0x/hyperblaze/actions/workflows/ci.yml"><img src="https://github.com/Ashutosh0x/hyperblaze/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/Ashutosh0x/hyperblaze/actions/workflows/codeql.yml"><img src="https://github.com/Ashutosh0x/hyperblaze/actions/workflows/codeql.yml/badge.svg" alt="CodeQL" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-F9A825?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License" /></a>
 </p>
 
@@ -94,8 +95,18 @@ cargo install --path crates/hb-cli
 ### Initialize a workspace
 
 ```bash
-cd your-project
+mkdir hello-hyperblaze
+cd hello-hyperblaze
 hyperblaze init
+mkdir src
+printf 'fn main() { println!("Hello from Hyperblaze!"); }\n' > src/main.rs
+cat > BUILD.hb <<'EOF'
+[[target]]
+name = "hello"
+rule = "rust_binary"
+srcs = ["src/main.rs"]
+edition = "2021"
+EOF
 ```
 
 ```
@@ -113,7 +124,7 @@ hyperblaze init
 ### Build
 
 ```bash
-hyperblaze build //...
+hyperblaze build //:hello
 ```
 
 ```
@@ -122,7 +133,7 @@ hyperblaze build //...
      Jobs: 12 | Cache: on
 
   Build successful in 0.0s
-     1 targets built, 0 cached, 1 evaluated, 0 failed
+     1 compiled, 0 cached, 0 failed
 ```
 
 ### Check your environment
@@ -323,6 +334,8 @@ cargo fmt --all -- --check
 ---
 
 ## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for the full milestone plan.
 
 | Phase | Status | What |
 |-------|--------|------|

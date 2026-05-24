@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a reproducible Hyperblaze problem.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Hyperblaze. Please include enough detail for a maintainer to reproduce the issue.
+  - type: input
+    id: version
+    attributes:
+      label: Hyperblaze version or commit
+      placeholder: "v0.1.0 or ace6369"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the bug and the expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include commands, BUILD.hb, source snippets, and output where possible.
+      placeholder: |
+        1. Create ...
+        2. Run ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or diagnostics
+      render: text
+      description: Paste relevant `hyperblaze doctor`, `hyperblaze build`, or CI output.

@@ -4,10 +4,10 @@
 
 ### From Source (Recommended)
 
-Requires Rust 1.75+ and Cargo:
+Requires Rust 1.85+ and Cargo:
 
 ```bash
-git clone https://github.com/hyperblaze/hyperblaze.git
+git clone https://github.com/Ashutosh0x/hyperblaze.git
 cd hyperblaze
 cargo install --path crates/hb-cli
 ```
@@ -42,6 +42,20 @@ This will:
 3. Update `.gitignore` with Hyperblaze entries
 4. Auto-detect languages in your project
 
+Create a first Rust target:
+
+```bash
+mkdir src
+printf 'fn main() { println!("Hello from Hyperblaze!"); }\n' > src/main.rs
+cat > BUILD.hb <<'EOF'
+[[target]]
+name = "hello"
+rule = "rust_binary"
+srcs = ["src/main.rs"]
+edition = "2021"
+EOF
+```
+
 ### Auto-Detection
 
 Hyperblaze automatically detects:
@@ -56,10 +70,10 @@ Hyperblaze automatically detects:
 
 ```bash
 # Build all targets
-hyperblaze build
+hyperblaze build //...
 
 # Build specific targets
-hyperblaze build //src:main //lib:core
+hyperblaze build //:hello
 
 # Build with verbose output
 hyperblaze build -v //...
@@ -72,16 +86,21 @@ hyperblaze build -j 8 //...
 
 ## Running Tests
 
+`hyperblaze test` is currently a placeholder command. Use Cargo for project tests until the `rust_test` rule lands:
+
 ```bash
-hyperblaze test //...
+cargo test
 ```
 
 ---
 
 ## Running a Binary
 
+`hyperblaze run` is currently a placeholder command. Build the binary and run it from `.hb-out/` for now:
+
 ```bash
-hyperblaze run //src:main -- --flag1 --flag2
+hyperblaze build //:hello
+./.hb-out/hello
 ```
 
 ---
@@ -110,7 +129,7 @@ version = "0.1.0"          # Project version
 [build]
 jobs = 0                   # Parallel jobs (0 = auto-detect CPU count)
 disk_cache = true          # Enable disk-based action cache
-output_dir = ".hb-out"     # Build output directory
+output_base = ".hb-out"    # Build output directory
 
 [remote]
 # Uncomment to enable remote caching:
@@ -132,7 +151,7 @@ output_dir = ".hb-out"     # Build output directory
 |---------|---------|-------------|
 | `build.jobs` | `0` (auto) | Number of parallel build jobs |
 | `build.disk_cache` | `true` | Cache action results on disk |
-| `build.output_dir` | `.hb-out` | Where build outputs are written |
+| `build.output_base` | `.hb-out` | Where build outputs are written |
 | `remote.cache_url` | None | Remote cache server URL |
 | `remote.exec_url` | None | Remote execution server URL |
 
@@ -145,15 +164,15 @@ hyperblaze [OPTIONS] <COMMAND>
 
 Commands:
   build    Build the specified targets
-  test     Run tests
-  run      Run a binary target
+  test     Placeholder for future test execution
+  run      Placeholder for future binary execution
   clean    Clean build outputs
   init     Initialize a new workspace
-  query    Query the dependency graph
-  fmt      Format BUILD.hb files
+  query    Planned dependency graph query
+  fmt      Planned BUILD.hb formatter
   info     Show build system information
   doctor   Diagnose common issues
-  graph    Show the dependency graph
+  graph    Planned dependency graph visualization
 
 Options:
   -v, --verbose...  Verbose output (-v, -vv, -vvv)
@@ -176,7 +195,7 @@ This checks:
 - Platform compatibility
 - CPU core count
 - Available memory
-- Installed compilers (rustc, go, gcc)
+- Installed tools (rustc, go, git)
 - Version control (git)
 - Workspace configuration
 
@@ -186,4 +205,4 @@ This checks:
 
 - Read [ARCHITECTURE.md](ARCHITECTURE.md) for technical details
 - Read [DESIGN.md](DESIGN.md) for design philosophy
-- Check the [Roadmap](../README.md#roadmap) for upcoming features
+- Check the [Roadmap](../ROADMAP.md) for upcoming features

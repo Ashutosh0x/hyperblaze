@@ -43,14 +43,14 @@ enum Commands {
         jobs: usize,
     },
 
-    /// Run tests
+    /// Placeholder for future test execution
     Test {
         /// Test targets
         #[arg(default_value = "//...")]
         targets: Vec<String>,
     },
 
-    /// Run a binary target
+    /// Placeholder for future binary execution
     Run {
         /// Target to run
         target: String,
