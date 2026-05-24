@@ -1,0 +1,18 @@
+[package]
+name = "hb-exec"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Execution engine — local, sandboxed, and remote action execution for Hyperblaze"
+
+[dependencies]
+hb-core = { path = "../hb-core" }
+hb-graph = { path = "../hb-graph" }
+tokio.workspace = true
+blake3.workspace = true
+redb.workspace = true
+tracing.workspace = true
+miette.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+serde_json.workspace = true

@@ -1,0 +1,19 @@
+[package]
+name = "hb-graph"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "HyperGraph — async incremental computation engine for Hyperblaze"
+
+[dependencies]
+hb-core = { path = "../hb-core" }
+tokio.workspace = true
+dashmap.workspace = true
+crossbeam.workspace = true
+rayon.workspace = true
+tracing.workspace = true
+miette.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+blake3.workspace = true
+redb.workspace = true

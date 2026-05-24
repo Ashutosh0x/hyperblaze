@@ -1,0 +1,23 @@
+[package]
+name = "hb-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Hyperblaze CLI — the user-facing binary"
+
+[[bin]]
+name = "hyperblaze"
+path = "src/main.rs"
+
+[dependencies]
+hb-core = { path = "../hb-core" }
+hb-graph = { path = "../hb-graph" }
+hb-exec = { path = "../hb-exec" }
+tokio.workspace = true
+clap.workspace = true
+ratatui.workspace = true
+crossterm.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+miette.workspace = true
+chrono.workspace = true
