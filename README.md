@@ -169,37 +169,74 @@ Benchmarked on a 12-core machine with 32 GB RAM:
 
 ## Architecture
 
-```
-+-----------------------------------------------------+
-|                   hyperblaze CLI                     |
-|                  (clap + ratatui)                    |
-+-----------------------------------------------------+
-|              HyperGraph Engine (hb-graph)            |
-|  +----------+  +----------+  +------------------+  |
-|  | NodeKey  |-> |ComputeFn |-> |   NodeValue      |  |
-|  |(function |  |(async fn)|  | (type-erased)    |  |
-|  | + arg)   |  |          |  |                  |  |
-|  +----------+  +----+-----+  +------------------+  |
-|                     | ctx.require(dep).await         |
-|                     | (SUSPENDS, doesn't restart!)   |
-|                     v                                |
-|  +----------------------------------------------+   |
-|  |  DashMap<NodeKey, Arc<NodeEntry>>             |   |
-|  |  Lock-free concurrent dependency graph        |   |
-|  +----------------------------------------------+   |
-+-----------------------------------------------------+
-|              Execution Engine (hb-exec)              |
-|  +------------+  +--------------+  +------------+  |
-|  | Action     |-> | LocalRunner  |-> |ActionCache |  |
-|  | (cmd+args) |  |(tokio proc)  |  |(disk, CAS) |  |
-|  +------------+  +--------------+  +------------+  |
-+-----------------------------------------------------+
-|               Core Runtime (hb-core)                 |
-|  +--------+ +--------+ +--------+ +--------------+ |
-|  | Config | | Digest | |  VFS   | |  Platform    | |
-|  | TOML   | | BLAKE3 | | Cache  | |  Detection   | |
-|  +--------+ +--------+ +--------+ +--------------+ |
-+-----------------------------------------------------+
+```mermaid
+graph TB
+    subgraph CLI["hyperblaze CLI (hb-cli)"]
+        direction LR
+        CLAP["Clap Parser"]
+        CMDS["Commands: build, test, run, init, info, doctor, clean"]
+    end
+
+    subgraph GRAPH["HyperGraph Engine (hb-graph)"]
+        direction TB
+        NK["NodeKey<br/>(FunctionType + arg)"]
+        CF["ComputeFn<br/>(async fn)"]
+        NV["NodeValue<br/>(type-erased)"]
+        NK --> CF --> NV
+        
+        subgraph EVAL["Parallel Evaluator"]
+            CTX["ComputeContext<br/>ctx.require(dep).await<br/>SUSPENDS, doesn't restart"]
+        end
+        
+        subgraph DAG["Lock-Free Dependency Graph"]
+            DM["DashMap &lt;NodeKey, Arc&lt;NodeEntry&gt;&gt;"]
+            EC["Early Cutoff<br/>(BLAKE3 value digest)"]
+        end
+        
+        CF --> CTX
+        CTX --> DAG
+    end
+
+    subgraph EXEC["Execution Engine (hb-exec)"]
+        direction LR
+        ACT["Action<br/>(cmd + args + inputs)"]
+        RUN["LocalRunner<br/>(tokio::process)"]
+        CACHE["ActionCache<br/>(sharded disk CAS)"]
+        ACT --> RUN --> CACHE
+    end
+
+    subgraph CORE["Core Runtime (hb-core)"]
+        direction LR
+        CFG["Config<br/>(TOML)"]
+        DIG["Digest<br/>(BLAKE3)"]
+        VFS["VFS<br/>(File Cache)"]
+        PLT["Platform<br/>(Detection)"]
+        WAT["Watcher<br/>(notify)"]
+    end
+
+    CLI --> GRAPH
+    GRAPH --> EXEC
+    EXEC --> CORE
+    WAT -->|"file changes"| DAG
+
+    style CLI fill:#1a1a2e,stroke:#FF6B00,color:#fff
+    style GRAPH fill:#16213e,stroke:#0f3460,color:#fff
+    style EXEC fill:#1a1a2e,stroke:#e94560,color:#fff
+    style CORE fill:#0f3460,stroke:#533483,color:#fff
+    style NK fill:#FF6B00,stroke:#fff,color:#fff
+    style CF fill:#e94560,stroke:#fff,color:#fff
+    style NV fill:#533483,stroke:#fff,color:#fff
+    style CTX fill:#0f3460,stroke:#00C853,color:#fff
+    style DM fill:#1D76DB,stroke:#fff,color:#fff
+    style EC fill:#00C853,stroke:#fff,color:#fff
+    style ACT fill:#FF6B00,stroke:#fff,color:#fff
+    style RUN fill:#e94560,stroke:#fff,color:#fff
+    style CACHE fill:#533483,stroke:#fff,color:#fff
+    style CFG fill:#9C27B0,stroke:#fff,color:#fff
+    style DIG fill:#4A154B,stroke:#fff,color:#fff
+    style VFS fill:#4CAF50,stroke:#fff,color:#fff
+    style PLT fill:#0288D1,stroke:#fff,color:#fff
+    style WAT fill:#00C853,stroke:#fff,color:#fff
 ```
 
 ### The No-Restart Protocol
