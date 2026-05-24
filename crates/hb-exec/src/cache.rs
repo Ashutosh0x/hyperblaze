@@ -73,9 +73,8 @@ impl ActionCache {
             std::fs::create_dir_all(parent)?;
         }
 
-        let content = serde_json::to_string_pretty(result).map_err(|e| {
-            HbError::Cache(format!("Failed to serialize action result: {}", e))
-        })?;
+        let content = serde_json::to_string_pretty(result)
+            .map_err(|e| HbError::Cache(format!("Failed to serialize action result: {}", e)))?;
 
         std::fs::write(&cache_path, content)?;
         debug!("Cached action result: {}", action.description);

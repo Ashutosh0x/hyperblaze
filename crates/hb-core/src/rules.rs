@@ -61,11 +61,7 @@ fn execute_rust_target(
     let start = Instant::now();
 
     // Resolve source files to absolute paths
-    let src_paths: Vec<PathBuf> = target
-        .srcs
-        .iter()
-        .map(|s| workspace_root.join(s))
-        .collect();
+    let src_paths: Vec<PathBuf> = target.srcs.iter().map(|s| workspace_root.join(s)).collect();
 
     // Verify all sources exist
     for src in &src_paths {
@@ -104,23 +100,22 @@ fn execute_rust_target(
     let output_path = output_dir.join(&output_filename);
 
     // Cache check
-    if let Ok(cache_content) = std::fs::read_to_string(&cache_file) {
-        if let Ok(entry) = serde_json::from_str::<CacheEntry>(&cache_content) {
-            if entry.input_digest == input_digest && output_path.exists() {
-                return Ok(RuleResult {
-                    output: output_path,
-                    input_digest,
-                    cached: true,
-                    elapsed_ms: start.elapsed().as_millis() as u64,
-                });
-            }
-        }
+    if let Ok(cache_content) = std::fs::read_to_string(&cache_file)
+        && let Ok(entry) = serde_json::from_str::<CacheEntry>(&cache_content)
+        && entry.input_digest == input_digest
+        && output_path.exists()
+    {
+        return Ok(RuleResult {
+            output: output_path,
+            input_digest,
+            cached: true,
+            elapsed_ms: start.elapsed().as_millis() as u64,
+        });
     }
 
     // Ensure output directory exists
-    std::fs::create_dir_all(output_dir).map_err(|e| {
-        HbError::Internal(format!("Failed to create output dir: {}", e))
-    })?;
+    std::fs::create_dir_all(output_dir)
+        .map_err(|e| HbError::Internal(format!("Failed to create output dir: {}", e)))?;
 
     // Build rustc command
     let mut cmd = Command::new("rustc");
@@ -204,9 +199,8 @@ fn compute_input_digest(
 
     // Hash each source file
     for src in src_paths {
-        let d = digest::digest_file(src).map_err(|e| {
-            HbError::Internal(format!("Failed to hash {}: {}", src.display(), e))
-        })?;
+        let d = digest::digest_file(src)
+            .map_err(|e| HbError::Internal(format!("Failed to hash {}: {}", src.display(), e)))?;
         digests.push(d);
     }
 
@@ -214,17 +208,13 @@ fn compute_input_digest(
     let mut dep_names: Vec<&String> = dep_outputs.keys().collect();
     dep_names.sort(); // Deterministic ordering
     for dep_name in dep_names {
-        if let Some(dep_path) = dep_outputs.get(dep_name) {
-            if dep_path.exists() {
-                let d = digest::digest_file(dep_path).map_err(|e| {
-                    HbError::Internal(format!(
-                        "Failed to hash dep {}: {}",
-                        dep_path.display(),
-                        e
-                    ))
-                })?;
-                digests.push(d);
-            }
+        if let Some(dep_path) = dep_outputs.get(dep_name)
+            && dep_path.exists()
+        {
+            let d = digest::digest_file(dep_path).map_err(|e| {
+                HbError::Internal(format!("Failed to hash dep {}: {}", dep_path.display(), e))
+            })?;
+            digests.push(d);
         }
     }
 
@@ -259,9 +249,7 @@ mod tests {
         };
 
         let output_dir = workspace.join(".hb-out");
-        let result =
-            execute_rust_binary(&target, workspace, &output_dir, &HashMap::new())
-                .unwrap();
+        let result = execute_rust_binary(&target, workspace, &output_dir, &HashMap::new()).unwrap();
 
         assert!(result.output.exists(), "Binary should exist");
         assert!(!result.cached, "First build should not be cached");
@@ -309,11 +297,7 @@ mod tests {
 
         let src_dir = workspace.join("src");
         std::fs::create_dir_all(&src_dir).unwrap();
-        std::fs::write(
-            src_dir.join("main.rs"),
-            "fn main() { println!(\"v1\"); }\n",
-        )
-        .unwrap();
+        std::fs::write(src_dir.join("main.rs"), "fn main() { println!(\"v1\"); }\n").unwrap();
 
         let target = TargetDef {
             name: "invalidation_test".to_string(),
@@ -332,11 +316,7 @@ mod tests {
         assert!(!r1.cached);
 
         // Modify source
-        std::fs::write(
-            src_dir.join("main.rs"),
-            "fn main() { println!(\"v2\"); }\n",
-        )
-        .unwrap();
+        std::fs::write(src_dir.join("main.rs"), "fn main() { println!(\"v2\"); }\n").unwrap();
 
         // Rebuild -- should NOT be cached (source changed)
         let r2 = execute_rust_binary(&target, workspace, &output_dir, &deps).unwrap();
@@ -368,8 +348,7 @@ mod tests {
 
         let output_dir = workspace.join(".hb-out");
         let result =
-            execute_rust_library(&target, workspace, &output_dir, &HashMap::new())
-                .unwrap();
+            execute_rust_library(&target, workspace, &output_dir, &HashMap::new()).unwrap();
 
         assert!(result.output.exists(), "Library should exist");
         assert!(

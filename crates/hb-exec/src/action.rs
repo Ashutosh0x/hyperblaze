@@ -71,8 +71,11 @@ impl Action {
     pub fn cache_key(&self) -> ContentDigest {
         let input_digests: Vec<ContentDigest> =
             self.inputs.iter().map(|i| i.digest.clone()).collect();
-        let env_pairs: Vec<(String, String)> =
-            self.env.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
+        let env_pairs: Vec<(String, String)> = self
+            .env
+            .iter()
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect();
         hb_core::digest::action_cache_key(&input_digests, &self.args, &env_pairs)
     }
 }

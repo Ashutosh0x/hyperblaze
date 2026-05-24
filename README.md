@@ -11,7 +11,7 @@
 <p align="center">
   <a href="#performance"><img src="https://img.shields.io/badge/startup-0.4ms-00C853?style=for-the-badge&logo=zap&logoColor=white" alt="Startup Time" /></a>
   <a href="#performance"><img src="https://img.shields.io/badge/memory-~50MB-2196F3?style=for-the-badge&logo=databricks&logoColor=white" alt="Memory" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-33_passing-00C853?style=for-the-badge&logo=checkmarx&logoColor=white" alt="Tests" /></a>
+  <a href=".github/workflows/ci.yml"><img src="https://img.shields.io/badge/tests-CI_covered-00C853?style=for-the-badge&logo=checkmarx&logoColor=white" alt="Tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-F9A825?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License" /></a>
 </p>
 
@@ -76,7 +76,7 @@ Build systems shouldn't fight you. **Bazel** takes 3-15 seconds just to start. *
 - **Lock-free graph** -- DashMap-based concurrent access, zero contention
 - **BUILD.hb parser** -- TOML-based build files with `[[target]]` definitions
 - **Built-in diagnostics** -- `hyperblaze doctor` checks your entire environment
-- **33 tests** -- Unit tests, integration tests, real rustc invocation tests
+- **CI-covered tests** -- Unit tests, integration tests, real rustc invocation tests
 
 ---
 
@@ -85,8 +85,8 @@ Build systems shouldn't fight you. **Bazel** takes 3-15 seconds just to start. *
 ### Install
 
 ```bash
-# From source (requires Rust 1.75+)
-git clone https://github.com/hyperblaze/hyperblaze.git
+# From source (requires Rust 1.85+)
+git clone https://github.com/Ashutosh0x/hyperblaze.git
 cd hyperblaze
 cargo install --path crates/hb-cli
 ```
@@ -158,8 +158,8 @@ hyperblaze doctor
 | **Hashing (BLAKE3)** | 3-5x faster | SHA-256 | BLAKE3 | SHA-256 | Measured |
 
 > **Note:** "Measured" values come from `hyperblaze info` on a 12-core Windows machine.
-> "Target" values are design goals for Phase 1+ (file watching daemon, real compilation rules).
-> Hyperblaze does not yet compile real projects -- these targets are based on architectural analysis.
+> "Target" values are design goals for Phase 1+ work such as the file watcher daemon,
+> persistent graph cache, and larger benchmark projects.
 
 ---
 
@@ -167,9 +167,10 @@ hyperblaze doctor
 
 Hyperblaze is at **v0.1.0** (early alpha). Be aware of what it cannot do yet:
 
-- **No real compilation** -- does not invoke `rustc`, `go build`, or any compiler yet
-- **No BUILD file parser** -- BUILD.hb syntax is designed but not implemented
-- **No dependency inference** -- cannot scan source imports to discover deps
+- **Rust-only compilation** -- `rust_binary` and `rust_library` invoke `rustc`; Go, Python, TypeScript, C++, and Java are planned
+- **Explicit BUILD.hb deps only** -- cannot scan source imports to discover deps
+- **Limited Rust model** -- no Cargo feature resolution, proc-macro support, build scripts, or crate registry integration yet
+- **`test`, `run`, `query`, `fmt`, and `graph` are placeholders** -- command shells exist, but full behavior is planned
 - **No remote cache/execution** -- local only, RE API planned for Phase 3
 - **No WASM sandboxing** -- actions run unsandboxed on the host
 - **No TUI progress bars** -- text output only (ratatui integration planned)
@@ -278,15 +279,15 @@ async fn compute(key: NodeKey, ctx: &mut ComputeContext) -> Result<NodeValue> {
 | Command | Description |
 |---------|-------------|
 | `hyperblaze build [targets]` | Build the specified targets |
-| `hyperblaze test [targets]` | Run tests |
-| `hyperblaze run <target>` | Run a binary target |
+| `hyperblaze test [targets]` | Placeholder for future test execution |
+| `hyperblaze run <target>` | Placeholder for future binary execution |
 | `hyperblaze clean [--expunge]` | Clean build outputs |
 | `hyperblaze init [--name]` | Initialize a new workspace |
 | `hyperblaze info` | Show system information |
 | `hyperblaze doctor` | Diagnose environment issues |
-| `hyperblaze query <expr>` | Query the dependency graph |
-| `hyperblaze fmt` | Format BUILD.hb files |
-| `hyperblaze graph <target>` | Visualize dependency graph |
+| `hyperblaze query <expr>` | Planned dependency graph query |
+| `hyperblaze fmt` | Planned BUILD.hb formatter |
+| `hyperblaze graph <target>` | Planned dependency graph visualization |
 
 ---
 
@@ -302,7 +303,7 @@ version = "0.1.0"
 [build]
 jobs = 0          # 0 = auto-detect CPU count
 disk_cache = true
-output_dir = ".hb-out"
+output_base = ".hb-out"
 
 [remote]
 # cache_url = "grpc://cache.example.com:8080"
@@ -315,19 +316,8 @@ output_dir = ".hb-out"
 
 ```bash
 cargo test --workspace
-```
-
-```
-running 17 tests
-test hb_core::digest::tests::test_digest_deterministic ... ok
-test hb_core::digest::tests::test_digest_different_content ... ok
-test hb_core::vfs::tests::test_matches_glob_extension ... ok
-test hb_graph::key::tests::test_key_equality ... ok
-test hb_graph::graph::tests::test_invalidation_propagates ... ok
-test hb_graph::evaluator::tests::test_simple_evaluation ... ok
-test hb_graph::evaluator::tests::test_evaluation_with_deps ... ok
-test hb_graph::evaluator::tests::test_cache_hit ... ok
-... 17 passed; 0 failed
+cargo clippy --workspace --all-targets -- -D warnings
+cargo fmt --all -- --check
 ```
 
 ---
@@ -337,11 +327,17 @@ test hb_graph::evaluator::tests::test_cache_hit ... ok
 | Phase | Status | What |
 |-------|--------|------|
 | **Phase 0** | Complete | Workspace skeleton, HyperGraph engine, CLI |
-| **Phase 1** | In Progress | File watcher daemon, early cutoff, real Rust rules |
-| **Phase 2** | Planned | BUILD.hb parser, Go rules, dependency inference |
+| **Phase 1** | In Progress | File watcher daemon, early cutoff, persistent graph cache |
+| **Phase 2** | Planned | Rust test/run rules, Go rules, dependency inference |
 | **Phase 3** | Planned | WASM sandboxing, remote cache client |
 | **Phase 4** | Planned | TUI progress bars, SLSA provenance |
 | **Phase 5** | Planned | Benchmarks vs Bazel, public launch |
+
+---
+
+## Funding
+
+Hyperblaze has a machine-readable [`funding.json`](funding.json) manifest and GitHub Sponsors metadata in [`.github/FUNDING.yml`](.github/FUNDING.yml). If this project helps your build tooling work, sponsorship support goes toward the file watcher daemon, early cutoff, persistent graph cache, and benchmark suite.
 
 ---
 
@@ -377,4 +373,3 @@ MIT License -- see [LICENSE](LICENSE) for details.
 <p align="center">
   <strong>Built with Rust by <a href="https://github.com/Ashutosh0x">Ashutosh Kumar Singh</a></strong>
 </p>
-

@@ -5,13 +5,13 @@
 //! and manually manages node scheduling, we leverage tokio's async
 //! runtime to automatically balance work across threads.
 
+use crate::function::ComputeContext;
 use crate::function::ComputeFnBox;
 use crate::graph::HyperGraph;
 use crate::key::{FunctionType, NodeKey};
-use crate::function::ComputeContext;
 use crate::value::NodeValue;
-use hb_core::error::{HbError, HbResult};
 use dashmap::DashMap;
+use hb_core::error::{HbError, HbResult};
 use std::sync::Arc;
 use std::time::Instant;
 use tracing::{debug, warn};
@@ -65,7 +65,6 @@ impl Evaluator {
     }
 
     /// Evaluate a single key and return its value.
-
     pub async fn evaluate(&self, key: &NodeKey) -> HbResult<NodeValue> {
         let start = Instant::now();
 
@@ -90,7 +89,8 @@ impl Evaluator {
     /// Evaluate multiple root keys in parallel.
     pub async fn evaluate_many(&self, keys: &[NodeKey]) -> HbResult<EvalResult> {
         let start = Instant::now();
-        let mut join_set: tokio::task::JoinSet<HbResult<(NodeKey, NodeValue, bool)>> = tokio::task::JoinSet::new();
+        let mut join_set: tokio::task::JoinSet<HbResult<(NodeKey, NodeValue, bool)>> =
+            tokio::task::JoinSet::new();
         let mut evaluated = 0usize;
         let mut cached = 0usize;
         let mut errors = 0usize;
@@ -110,9 +110,8 @@ impl Evaluator {
                 }
 
                 // Evaluate
-                let value = Self::evaluate_node_static(
-                    evaluator_graph, &functions, key.clone()
-                ).await?;
+                let value =
+                    Self::evaluate_node_static(evaluator_graph, &functions, key.clone()).await?;
                 Ok((key, value, false))
             });
         }
@@ -211,7 +210,9 @@ impl Evaluator {
                 Ok(value)
             }
             Err(err) => {
-                entry.fail(HbError::GraphEvaluation(format!("{}", err))).await;
+                entry
+                    .fail(HbError::GraphEvaluation(format!("{}", err)))
+                    .await;
                 Err(err)
             }
         }
@@ -273,9 +274,7 @@ mod tests {
         evaluator.register(
             FunctionType::PackageLoad,
             compute_fn(|key, mut ctx| async move {
-                let file_key = NodeKey::file_state(
-                    &format!("{}/BUILD.hb", key.argument())
-                );
+                let file_key = NodeKey::file_state(&format!("{}/BUILD.hb", key.argument()));
                 let _file_value = ctx.require(file_key).await?;
                 Ok(NodeValue::new(format!("package:{}", key.argument())))
             }),

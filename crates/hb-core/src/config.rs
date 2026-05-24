@@ -13,7 +13,7 @@ pub const CONFIG_FILE_NAME: &str = "HYPERBLAZE.toml";
 pub const BUILD_FILE_NAME: &str = "BUILD.hb";
 
 /// Root configuration for a Hyperblaze workspace.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct HyperblazeConfig {
     /// Project metadata
     #[serde(default)]
@@ -66,7 +66,7 @@ pub struct BuildConfig {
     pub cache_dir: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct RemoteConfig {
     /// Remote cache URL (e.g., "grpc://cache.company.com:8080")
     #[serde(default)]
@@ -122,15 +122,33 @@ pub struct PythonConfig {
 }
 
 // Default value functions
-fn default_project_name() -> String { "hyperblaze-project".to_string() }
-fn default_version() -> String { "0.1.0".to_string() }
-fn default_output_base() -> String { ".hb-out".to_string() }
-fn default_true() -> bool { true }
-fn default_cache_dir() -> String { ".hb-cache".to_string() }
-fn default_rust_edition() -> String { "2024".to_string() }
-fn default_rust_toolchain() -> String { "stable".to_string() }
-fn default_go_version() -> String { "1.23".to_string() }
-fn default_python_version() -> String { "3.12".to_string() }
+fn default_project_name() -> String {
+    "hyperblaze-project".to_string()
+}
+fn default_version() -> String {
+    "0.1.0".to_string()
+}
+fn default_output_base() -> String {
+    ".hb-out".to_string()
+}
+fn default_true() -> bool {
+    true
+}
+fn default_cache_dir() -> String {
+    ".hb-cache".to_string()
+}
+fn default_rust_edition() -> String {
+    "2024".to_string()
+}
+fn default_rust_toolchain() -> String {
+    "stable".to_string()
+}
+fn default_go_version() -> String {
+    "1.23".to_string()
+}
+fn default_python_version() -> String {
+    "3.12".to_string()
+}
 
 impl Default for ProjectConfig {
     fn default() -> Self {
@@ -149,27 +167,6 @@ impl Default for BuildConfig {
             output_base: default_output_base(),
             disk_cache: true,
             cache_dir: default_cache_dir(),
-        }
-    }
-}
-
-impl Default for RemoteConfig {
-    fn default() -> Self {
-        Self {
-            cache_url: None,
-            exec_url: None,
-            instance_name: None,
-        }
-    }
-}
-
-impl Default for HyperblazeConfig {
-    fn default() -> Self {
-        Self {
-            project: ProjectConfig::default(),
-            build: BuildConfig::default(),
-            remote: RemoteConfig::default(),
-            languages: LanguagesConfig::default(),
         }
     }
 }

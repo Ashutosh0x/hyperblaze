@@ -6,8 +6,8 @@
 //! - File change tracking
 
 use crate::digest::ContentDigest;
-use std::path::{Path, PathBuf};
 use dashmap::DashMap;
+use std::path::{Path, PathBuf};
 
 /// Cached file metadata for change detection.
 #[derive(Debug, Clone)]
@@ -51,12 +51,12 @@ impl FileCache {
         let size = metadata.len();
 
         // Check cache
-        if let Some(entry) = self.entries.get(path) {
-            if entry.mtime == mtime && entry.size == size {
-                if let Some(ref digest) = entry.digest {
-                    return Ok(digest.clone());
-                }
-            }
+        if let Some(entry) = self.entries.get(path)
+            && entry.mtime == mtime
+            && entry.size == size
+            && let Some(ref digest) = entry.digest
+        {
+            return Ok(digest.clone());
         }
 
         // Cache miss — compute digest
@@ -138,10 +138,7 @@ fn glob_files_recursive(
 
 /// Simple glob matching (supports *, **, and file extensions).
 fn matches_glob(path: &Path, pattern: &str) -> bool {
-    let file_name = path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("");
+    let file_name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
 
     // Handle simple extension patterns like "*.rs"
     if let Some(ext_pattern) = pattern.strip_prefix("*.") {

@@ -33,7 +33,7 @@ If you want to contribute, here are some accessible starting points:
 ### Code Style
 
 - Run `cargo fmt --all` before committing
-- Run `cargo clippy --workspace -- -D warnings` -- zero warnings policy
+- Run `cargo clippy --workspace --all-targets -- -D warnings` -- zero warnings policy
 - All public APIs must have doc comments
 
 ### Testing
@@ -79,3 +79,5 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for details. Key files:
 ## License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
+
+Please also follow the project [Code of Conduct](CODE_OF_CONDUCT.md). If you discover a vulnerability, report it privately using the process in [SECURITY.md](SECURITY.md).

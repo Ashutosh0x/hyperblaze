@@ -7,9 +7,9 @@
 
 use crate::key::NodeKey;
 use crate::value::NodeValue;
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
-use tokio::sync::{watch, RwLock};
+use std::sync::atomic::{AtomicU64, Ordering};
+use tokio::sync::{RwLock, watch};
 
 /// The lifecycle state of a graph node.
 #[derive(Debug)]
@@ -115,7 +115,12 @@ impl NodeEntry {
     /// Complete evaluation with a value.
     /// Returns `true` if the value changed (no early cutoff).
     /// Returns `false` if the value is the same as before (early cutoff — skip rdep invalidation).
-    pub async fn complete(&self, value: NodeValue, version: u64, digest: Option<hb_core::digest::ContentDigest>) -> bool {
+    pub async fn complete(
+        &self,
+        value: NodeValue,
+        version: u64,
+        digest: Option<hb_core::digest::ContentDigest>,
+    ) -> bool {
         // Early cutoff: compare digest with previous value
         let value_changed = if let Some(ref new_digest) = digest {
             let old_digest = self.value_digest.read().await;

@@ -4,12 +4,12 @@
 //! in this graph, connected by dependency edges.
 
 use crate::key::NodeKey;
+use crate::metrics::GraphMetrics;
 use crate::node::NodeEntry;
 use crate::value::NodeValue;
-use crate::metrics::GraphMetrics;
 use dashmap::DashMap;
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// The HyperGraph — a lock-free concurrent dependency graph.
 ///
@@ -205,15 +205,18 @@ mod tests {
 
         // Mark all as done
         let v = graph.version();
-        graph.get_or_create(&file_key).complete(
-            NodeValue::new("file_content".to_string()), v, None
-        ).await;
-        graph.get_or_create(&pkg_key).complete(
-            NodeValue::new("package".to_string()), v, None
-        ).await;
-        graph.get_or_create(&target_key).complete(
-            NodeValue::new("target".to_string()), v, None
-        ).await;
+        graph
+            .get_or_create(&file_key)
+            .complete(NodeValue::new("file_content".to_string()), v, None)
+            .await;
+        graph
+            .get_or_create(&pkg_key)
+            .complete(NodeValue::new("package".to_string()), v, None)
+            .await;
+        graph
+            .get_or_create(&target_key)
+            .complete(NodeValue::new("target".to_string()), v, None)
+            .await;
 
         // Invalidate the file — should propagate to pkg and target
         let count = graph.invalidate(&file_key).await;

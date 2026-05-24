@@ -28,7 +28,7 @@ pub mod node;
 pub mod value;
 
 pub use evaluator::Evaluator;
-pub use function::{ComputeFnBox, ComputeContext, compute_fn};
+pub use function::{ComputeContext, ComputeFnBox, compute_fn};
 pub use graph::HyperGraph;
 pub use key::NodeKey;
 pub use metrics::GraphMetrics;

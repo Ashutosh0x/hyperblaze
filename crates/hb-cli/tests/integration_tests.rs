@@ -31,7 +31,18 @@ version = "0.1.0"
 [build]
 jobs = 1
 disk_cache = true
-output_dir = ".hb-out"
+output_base = ".hb-out"
+"#,
+    )
+    .unwrap();
+
+    fs::write(
+        dir.join("BUILD.hb"),
+        r#"[[target]]
+name = "main"
+rule = "rust_binary"
+srcs = ["src/main.rs"]
+edition = "2021"
 "#,
     )
     .unwrap();
@@ -56,6 +67,20 @@ mod tests {
         assert_eq!(add(2, 3), 5);
     }
 }
+"#,
+    )
+    .unwrap();
+
+    fs::write(
+        dir.join("HYPERBLAZE.toml"),
+        r#"[project]
+name = "lib-app"
+version = "0.1.0"
+
+[build]
+jobs = 1
+disk_cache = true
+output_base = ".hb-out"
 "#,
     )
     .unwrap();
@@ -173,6 +198,8 @@ fn test_build_hello_world() {
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Build successful"));
+    let output_name = if cfg!(windows) { "main.exe" } else { "main" };
+    assert!(tmp.path().join(".hb-out").join(output_name).exists());
 }
 
 #[test]
@@ -202,6 +229,59 @@ fn test_noop_rebuild_uses_cache() {
     assert!(output2.status.success());
     let stdout2 = String::from_utf8_lossy(&output2.stdout);
     assert!(stdout2.contains("Build successful"));
+    assert!(stdout2.contains("cached"));
+}
+
+#[test]
+fn test_build_requested_binary_builds_library_dep() {
+    let bin = hyperblaze_bin();
+    if !bin.exists() {
+        return;
+    }
+
+    let tmp = tempfile::tempdir().unwrap();
+    create_rust_lib(tmp.path());
+    fs::write(
+        tmp.path().join("src").join("main.rs"),
+        r#"fn main() {
+    println!("{}", mylib::add(2, 3));
+}
+"#,
+    )
+    .unwrap();
+    fs::write(
+        tmp.path().join("BUILD.hb"),
+        r#"[[target]]
+name = "mylib"
+rule = "rust_library"
+srcs = ["src/lib.rs"]
+edition = "2021"
+
+[[target]]
+name = "app"
+rule = "rust_binary"
+srcs = ["src/main.rs"]
+deps = ["mylib"]
+edition = "2021"
+"#,
+    )
+    .unwrap();
+
+    let output = Command::new(&bin)
+        .args(["build", "//:app"])
+        .current_dir(tmp.path())
+        .output()
+        .expect("failed to run hyperblaze build");
+
+    assert!(
+        output.status.success(),
+        "build failed:\nstdout:\n{}\nstderr:\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(tmp.path().join(".hb-out").join("libmylib.rlib").exists());
+    let output_name = if cfg!(windows) { "app.exe" } else { "app" };
+    assert!(tmp.path().join(".hb-out").join(output_name).exists());
 }
 
 #[test]

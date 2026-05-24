@@ -56,10 +56,10 @@ impl ComputeContext {
         // If it's already done, return immediately (hot path)
         {
             let state = entry.state().await;
-            if let Some(value) = state.value() {
-                if !entry.is_dirty() {
-                    return Ok(value.clone());
-                }
+            if let Some(value) = state.value()
+                && !entry.is_dirty()
+            {
+                return Ok(value.clone());
             }
         }
 
@@ -75,10 +75,7 @@ impl ComputeContext {
     /// Request multiple dependencies in parallel.
     ///
     /// Equivalent to Bazel's `env.getValuesAndExceptions()` but async.
-    pub async fn require_all(
-        &mut self,
-        dep_keys: Vec<NodeKey>,
-    ) -> HbResult<Vec<NodeValue>> {
+    pub async fn require_all(&mut self, dep_keys: Vec<NodeKey>) -> HbResult<Vec<NodeValue>> {
         use tokio::task::JoinSet;
 
         let mut results = Vec::with_capacity(dep_keys.len());
@@ -97,10 +94,10 @@ impl ComputeContext {
                 // Check if already done
                 {
                     let state = entry.state().await;
-                    if let Some(value) = state.value() {
-                        if !entry.is_dirty() {
-                            return Ok((idx, value.clone()));
-                        }
+                    if let Some(value) = state.value()
+                        && !entry.is_dirty()
+                    {
+                        return Ok((idx, value.clone()));
                     }
                 }
 
@@ -116,8 +113,8 @@ impl ComputeContext {
         // Collect results in order
         let mut indexed_results: Vec<(usize, NodeValue)> = Vec::new();
         while let Some(result) = join_set.join_next().await {
-            let (idx, value) = result
-                .map_err(|e| HbError::Internal(format!("Join error: {}", e)))??;
+            let (idx, value) =
+                result.map_err(|e| HbError::Internal(format!("Join error: {}", e)))??;
             indexed_results.push((idx, value));
         }
         indexed_results.sort_by_key(|(idx, _)| *idx);
@@ -155,10 +152,13 @@ impl ComputeContext {
 
 /// Type alias for a compute function — a boxed async closure.
 pub type ComputeFnBox = Arc<
-    dyn Fn(NodeKey, ComputeContext) -> std::pin::Pin<
-        Box<dyn std::future::Future<Output = HbResult<NodeValue>> + Send>,
-    > + Send
-    + Sync,
+    dyn Fn(
+            NodeKey,
+            ComputeContext,
+        )
+            -> std::pin::Pin<Box<dyn std::future::Future<Output = HbResult<NodeValue>> + Send>>
+        + Send
+        + Sync,
 >;
 
 /// Register a compute function from a closure.

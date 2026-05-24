@@ -13,7 +13,9 @@ pub enum HbError {
     #[diagnostic(code(hyperblaze::config))]
     Config(String),
 
-    #[error("Workspace not found. Run `hyperblaze init` to create one, or navigate to a directory containing HYPERBLAZE.toml")]
+    #[error(
+        "Workspace not found. Run `hyperblaze init` to create one, or navigate to a directory containing HYPERBLAZE.toml"
+    )]
     #[diagnostic(
         code(hyperblaze::workspace::not_found),
         help("Create a workspace with: hyperblaze init")
@@ -66,7 +68,9 @@ pub enum HbError {
     #[error("Internal error: {0}")]
     #[diagnostic(
         code(hyperblaze::internal),
-        help("This is a bug in Hyperblaze. Please report it at https://github.com/hyperblaze-build/hyperblaze/issues")
+        help(
+            "This is a bug in Hyperblaze. Please report it at https://github.com/hyperblaze-build/hyperblaze/issues"
+        )
     )]
     Internal(String),
 }

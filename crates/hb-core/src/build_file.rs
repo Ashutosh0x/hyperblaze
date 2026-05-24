@@ -11,6 +11,7 @@
 //! ```
 
 use serde::Deserialize;
+use std::collections::HashSet;
 use std::path::Path;
 
 use crate::error::{HbError, HbResult};
@@ -55,28 +56,30 @@ fn default_edition() -> String {
 impl BuildFile {
     /// Parse a BUILD.hb file from a path.
     pub fn parse(path: &Path) -> HbResult<Self> {
-        let content = std::fs::read_to_string(path).map_err(|e| {
-            HbError::Internal(format!("Failed to read {}: {}", path.display(), e))
-        })?;
+        let content = std::fs::read_to_string(path)
+            .map_err(|e| HbError::Internal(format!("Failed to read {}: {}", path.display(), e)))?;
         Self::parse_str(&content, path)
     }
 
     /// Parse BUILD.hb content from a string.
     pub fn parse_str(content: &str, path: &Path) -> HbResult<Self> {
-        let build_file: BuildFile = toml::from_str(content).map_err(|e| {
-            HbError::Internal(format!(
-                "Failed to parse {}: {}",
-                path.display(),
-                e
-            ))
-        })?;
+        let build_file: BuildFile = toml::from_str(content)
+            .map_err(|e| HbError::Internal(format!("Failed to parse {}: {}", path.display(), e)))?;
 
         // Validate targets
+        let mut names = HashSet::new();
         for target in &build_file.target {
             if target.name.is_empty() {
                 return Err(HbError::Internal(format!(
                     "{}: target has empty name",
                     path.display()
+                )));
+            }
+            if !names.insert(&target.name) {
+                return Err(HbError::Internal(format!(
+                    "{}: duplicate target '{}'",
+                    path.display(),
+                    target.name
                 )));
             }
             if target.srcs.is_empty() {
@@ -176,6 +179,23 @@ srcs = []
 name = "bad"
 rule = "go_binary"
 srcs = ["main.go"]
+"#;
+        let result = BuildFile::parse_str(content, &PathBuf::from("BUILD.hb"));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_reject_duplicate_target_names() {
+        let content = r#"
+[[target]]
+name = "dup"
+rule = "rust_library"
+srcs = ["src/lib.rs"]
+
+[[target]]
+name = "dup"
+rule = "rust_binary"
+srcs = ["src/main.rs"]
 "#;
         let result = BuildFile::parse_str(content, &PathBuf::from("BUILD.hb"));
         assert!(result.is_err());

@@ -62,10 +62,7 @@ impl FileWatcher {
                                 continue;
                             }
 
-                            let _ = sender.send(FileChange {
-                                path,
-                                kind,
-                            });
+                            let _ = sender.send(FileChange { path, kind });
                         }
                     }
                 }

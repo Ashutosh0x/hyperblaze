@@ -1,0 +1,68 @@
+{
+  "$schema": "https://fundingjson.org/schema/v1.1.0.json",
+  "version": "v1.1.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Ashutosh Kumar Singh",
+    "email": "ashutoshkumarsingh0x@gmail.com",
+    "description": "Software engineer, security researcher, and Bazel contributor building next-generation build tooling in Rust.",
+    "webpageUrl": {
+      "url": "https://github.com/Ashutosh0x"
+    }
+  },
+  "projects": [
+    {
+      "guid": "hyperblaze",
+      "name": "Hyperblaze",
+      "description": "An async-native build graph engine written in Rust. Hyperblaze uses Rust async/await for incremental dependency suspension instead of restart protocols, and targets the developer experience pain points of Bazel and Buck2 for small-to-medium Rust monorepos.",
+      "webpageUrl": {
+        "url": "https://github.com/Ashutosh0x/hyperblaze"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/Ashutosh0x/hyperblaze"
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": [
+        "rust",
+        "build-system",
+        "developer-tools",
+        "bazel",
+        "monorepo",
+        "incremental-computation"
+      ]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "github-sponsors",
+        "type": "payment-provider",
+        "address": "https://github.com/sponsors/Ashutosh0x",
+        "description": "GitHub Sponsors profile for one-time and recurring support."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "phase1",
+        "status": "active",
+        "name": "Phase 1 - file watcher daemon and early cutoff",
+        "description": "Implement the file watcher daemon using the notify crate, persistent graph cache, and early cutoff algorithm. This makes no-op rebuilds near-instant and is the key demo milestone.",
+        "amount": 4800,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["github-sponsors"]
+      },
+      {
+        "guid": "fulltime-3mo",
+        "status": "active",
+        "name": "3 months full-time development",
+        "description": "Full-time work on Phases 1-2: daemon, early cutoff, 50-crate monorepo benchmark, hyperfine CI, technical blog post, and public launch.",
+        "amount": 15000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["github-sponsors"]
+      }
+    ]
+  }
+}

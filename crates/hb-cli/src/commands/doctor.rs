@@ -20,7 +20,10 @@ pub async fn run() -> HbResult<()> {
     if platform.cpu_count >= 2 {
         println!("\x1b[32m✓\x1b[0m {} cores", platform.cpu_count);
     } else {
-        println!("\x1b[33m⚠\x1b[0m Only {} core — builds will be slow", platform.cpu_count);
+        println!(
+            "\x1b[33m⚠\x1b[0m Only {} core — builds will be slow",
+            platform.cpu_count
+        );
         issues += 1;
     }
 
@@ -30,7 +33,10 @@ pub async fn run() -> HbResult<()> {
     if gb >= 4 {
         println!("\x1b[32m✓\x1b[0m {} GB", gb);
     } else {
-        println!("\x1b[33m⚠\x1b[0m Only {} GB — may be insufficient for large builds", gb);
+        println!(
+            "\x1b[33m⚠\x1b[0m Only {} GB — may be insufficient for large builds",
+            gb
+        );
         issues += 1;
     }
 
@@ -65,7 +71,11 @@ pub async fn run() -> HbResult<()> {
     if issues == 0 {
         println!("  \x1b[1;32m✅ Everything looks good!\x1b[0m");
     } else {
-        println!("  \x1b[1;33m⚠ {} issue{} found\x1b[0m", issues, if issues == 1 { "" } else { "s" });
+        println!(
+            "  \x1b[1;33m⚠ {} issue{} found\x1b[0m",
+            issues,
+            if issues == 1 { "" } else { "s" }
+        );
     }
     println!();
 

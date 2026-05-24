@@ -1,7 +1,7 @@
 //! `hyperblaze info` command
 
-use hb_core::platform::PlatformInfo;
 use hb_core::error::HbResult;
+use hb_core::platform::PlatformInfo;
 use std::time::Instant;
 
 pub fn run(start: Instant) -> HbResult<()> {
@@ -9,12 +9,19 @@ pub fn run(start: Instant) -> HbResult<()> {
     let startup_time = start.elapsed();
 
     println!();
-    println!("  🔥 \x1b[1;38;5;208mHyperblaze\x1b[0m v{}", hb_core::VERSION);
+    println!(
+        "  🔥 \x1b[1;38;5;208mHyperblaze\x1b[0m v{}",
+        hb_core::VERSION
+    );
     println!("{}", hb_core::BANNER);
     println!("  Platform:     {}", platform);
-    println!("  Startup time: {:.1}ms", startup_time.as_secs_f64() * 1000.0);
+    println!(
+        "  Startup time: {:.1}ms",
+        startup_time.as_secs_f64() * 1000.0
+    );
     println!("  CPU cores:    {}", platform.cpu_count);
-    println!("  Memory:       {} total, {} available",
+    println!(
+        "  Memory:       {} total, {} available",
         hb_core::platform::format_bytes(platform.total_memory),
         hb_core::platform::format_bytes(platform.available_memory),
     );
@@ -25,9 +32,19 @@ pub fn run(start: Instant) -> HbResult<()> {
         Some(root) => {
             println!("  Workspace:    {}", root.display());
             let config = hb_core::config::HyperblazeConfig::load(&root)?;
-            println!("  Project:      {} v{}", config.project.name, config.project.version);
+            println!(
+                "  Project:      {} v{}",
+                config.project.name, config.project.version
+            );
             println!("  Jobs:         {}", config.effective_jobs());
-            println!("  Disk cache:   {}", if config.build.disk_cache { "enabled" } else { "disabled" });
+            println!(
+                "  Disk cache:   {}",
+                if config.build.disk_cache {
+                    "enabled"
+                } else {
+                    "disabled"
+                }
+            );
             if let Some(ref url) = config.remote.cache_url {
                 println!("  Remote cache: {}", url);
             }
