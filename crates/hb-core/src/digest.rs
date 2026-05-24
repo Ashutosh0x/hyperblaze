@@ -150,6 +150,17 @@ pub fn action_cache_key(
     }
 }
 
+/// Convenience: hash a file on disk. Returns error as HbError.
+pub fn digest_file(path: &Path) -> Result<ContentDigest, std::io::Error> {
+    ContentDigest::of_file(path)
+}
+
+/// Convenience: combine multiple digests into one.
+pub fn combine_digests(digests: &[ContentDigest]) -> ContentDigest {
+    let refs: Vec<&ContentDigest> = digests.iter().collect();
+    ContentDigest::combine(&refs)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

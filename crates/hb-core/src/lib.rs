@@ -8,10 +8,12 @@
 //! - Error types and diagnostics
 //! - File watching for incremental builds
 
+pub mod build_file;
 pub mod config;
 pub mod digest;
 pub mod error;
 pub mod platform;
+pub mod rules;
 pub mod vfs;
 pub mod watcher;
 

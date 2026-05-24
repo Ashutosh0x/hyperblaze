@@ -11,7 +11,7 @@
 <p align="center">
   <a href="#performance"><img src="https://img.shields.io/badge/startup-0.4ms-00C853?style=for-the-badge&logo=zap&logoColor=white" alt="Startup Time" /></a>
   <a href="#performance"><img src="https://img.shields.io/badge/memory-~50MB-2196F3?style=for-the-badge&logo=databricks&logoColor=white" alt="Memory" /></a>
-  <a href="#"><img src="https://img.shields.io/badge/tests-17_passing-00C853?style=for-the-badge&logo=checkmarx&logoColor=white" alt="Tests" /></a>
+  <a href="#"><img src="https://img.shields.io/badge/tests-33_passing-00C853?style=for-the-badge&logo=checkmarx&logoColor=white" alt="Tests" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-F9A825?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License" /></a>
 </p>
 
@@ -40,12 +40,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white" alt="Rust" />
-  <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go" />
-  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=cplusplus&logoColor=white" alt="C++" />
-  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
 </p>
+
+> Go, Python, TypeScript, C++, and Java support is planned but not yet implemented.
 
 ### vs The Competition
 
@@ -72,15 +69,14 @@ Build systems shouldn't fight you. **Bazel** takes 3-15 seconds just to start. *
 
 ### Key Features
 
-- **0.4ms startup** — Native Rust binary, no JVM tax
-- **HyperGraph engine** — Async incremental computation (like Skyframe, but no restart protocol)
-- **Lock-free graph** — DashMap-based concurrent access, zero contention
-- **BLAKE3 hashing** — 3-5x faster than SHA-256 for content addressing
-- **Zero-config** — Auto-detects Rust, Go, Python, TypeScript projects
-- **Early cutoff** — Skip recomputation when values haven't changed (inspired by Buck2's DICE)
-- **File watcher** — Cross-platform filesystem monitoring for instant incremental builds
-- **Built-in diagnostics** — `hyperblaze doctor` checks your entire environment
-- **Beautiful output** — Colored terminal output with rich error messages
+- **0.4ms startup** -- Native Rust binary, no JVM tax
+- **Real compilation** -- `rust_binary` and `rust_library` rules that invoke `rustc`
+- **BLAKE3 input fingerprinting** -- Content-addressed caching, no-op rebuilds skip compilation
+- **HyperGraph engine** -- Async incremental computation (like Skyframe, but no restart protocol)
+- **Lock-free graph** -- DashMap-based concurrent access, zero contention
+- **BUILD.hb parser** -- TOML-based build files with `[[target]]` definitions
+- **Built-in diagnostics** -- `hyperblaze doctor` checks your entire environment
+- **33 tests** -- Unit tests, integration tests, real rustc invocation tests
 
 ---
 
